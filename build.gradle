@@ -1,17 +1,19 @@
 buildscript {
-  ext {
-    springBootVersion = '2.1.1.RELEASE'
-    gradleNodeVersion = '1.2.0'
-  }
-  repositories {
-    mavenCentral()
-    maven {
-      url "https://plugins.gradle.org/m2/"
+    ext {
+        springBootVersion = '2.1.1.RELEASE'
+        springBootDomaVersion = '1.1.1'
+        // springBootDomaVersionと合わせる必要がある
+        domaVersion = '2.16.1'
     }
-  }
-  dependencies {
-    classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-  }
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
 }
 
 apply plugin: 'java-library'
@@ -22,58 +24,77 @@ apply plugin: 'io.spring.dependency-management'
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = 1.8
+
+bootJar {
+    launchScript()
+}
+
+tasks.withType(AbstractCompile)*.options*.encoding = 'UTF-8'
+
 
 repositories {
-  mavenCentral()
+    mavenCentral()
 }
 
 
 dependencies {
-  implementation('org.springframework.boot:spring-boot-starter-web')
-  implementation("org.springframework.boot:spring-boot-starter-security")
-  runtimeOnly('org.springframework.boot:spring-boot-devtools')
-  compileOnly('org.springframework.boot:spring-boot-configuration-processor')
-  compileOnly('org.projectlombok:lombok')
-  testImplementation('org.springframework.boot:spring-boot-starter-test')
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation "org.seasar.doma.boot:doma-spring-boot-starter:${springBootDomaVersion}"
+
+    runtimeOnly 'org.springframework.boot:spring-boot-devtools'
+    compileOnly 'org.springframework.boot:spring-boot-configuration-processor'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    implementation 'mysql:mysql-connector-java'
+
+    // これがないとDomaのDaoのimplなクラスが生成されない
+    compileOnly "org.seasar.doma:doma:${domaVersion}"
+    annotationProcessor "org.seasar.doma:doma:${domaVersion}"
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 idea {
-  module {
-    inheritOutputDirs = false
+    module {
+        inheritOutputDirs = false
 
-    // when use doma, outputDir are should be 'build/classes{main,test}
-    outputDir file('build/classes/java/main')
-    testOutputDir file('build/classes/java/test')
-    downloadJavadoc = true
-    downloadSources = true
-  }
-  project {
-    ipr {
-      withXml { provider ->
-        // Get XML as groovy.util.Node to work with.
-        def projectXml = provider.asNode()
-
-        // Find compiler configuration component.
-        def compilerConfiguration = projectXml.component.find { component ->
-          component.'@name' == 'CompilerConfiguration'
-        }
-
-        // Replace current annotationProcessing
-        // that is part of the compiler configuration.
-        def currentAnnotationProcessing = compilerConfiguration.annotationProcessing
-        currentAnnotationProcessing.replaceNode {
-          annotationProcessing {
-            profile(name: 'Default', default: true, enabled: true) {
-              sourceOutputDir(name: "build/generated/source/apt/main")
-              sourceTestOutputDir(name: "build/generated/source/apt/test")
-              outputRelativeToContentRoot(value: "true")
-              processorPath(useClasspath: true)
-            }
-          }
-        }
-      }
+        // when use doma, outputDir are should be 'build/classes{main,test}
+        outputDir file('build/classes/java/main')
+        testOutputDir file('build/classes/java/test')
+        downloadJavadoc = true
+        downloadSources = true
     }
-  }
+    project {
+        ipr {
+            withXml { provider ->
+                // Get XML as groovy.util.Node to work with.
+                def projectXml = provider.asNode()
+
+                // Find compiler configuration component.
+                def compilerConfiguration = projectXml.component.find { component ->
+                    component.'@name' == 'CompilerConfiguration'
+                }
+
+                // Replace current annotationProcessing
+                // that is part of the compiler configuration.
+                def currentAnnotationProcessing = compilerConfiguration.annotationProcessing
+                currentAnnotationProcessing.replaceNode {
+                    annotationProcessing {
+                        profile(name: 'Default', default: true, enabled: true) {
+                            sourceOutputDir(name: "build/generated/source/apt/main")
+                            sourceTestOutputDir(name: "build/generated/source/apt/test")
+                            outputRelativeToContentRoot(value: "true")
+                            processorPath(useClasspath: true)
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
+// for doma
+processResources.destinationDir = compileJava.destinationDir
+compileJava.dependsOn processResources

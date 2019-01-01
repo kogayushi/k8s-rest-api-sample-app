@@ -1,3 +1,15 @@
 spring:
   profiles:
     active: local
+  datasource:
+    url: jdbc:mysql://localhost:3306/k8s_sample
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    platform: mysql
+    initialization-mode: always
+doma:
+  dialect: mysql
+logging:
+  level:
+    root: info
