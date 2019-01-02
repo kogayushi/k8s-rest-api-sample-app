@@ -104,7 +104,7 @@ jib {
         image = 'openjdk:8u181-jdk-alpine3.8'
     }
     to {
-        image = "sample/rest-api:${version}"
+        image = "kogayushi/k8s-sample-rest-api:${version}"
     }
     container {
         jvmFlags = ['-Xms128m', '-Xmx128m']
@@ -113,7 +113,6 @@ jib {
         ports = ['8080/tcp']
         useCurrentTimestamp = true
     }
-
 }
 
 // for doma
