@@ -4,6 +4,7 @@ buildscript {
         springBootDomaVersion = '1.1.1'
         // springBootDomaVersionと合わせる必要がある
         domaVersion = '2.16.1'
+        jibVersion = '0.10.1'
     }
     repositories {
         mavenCentral()
@@ -13,14 +14,17 @@ buildscript {
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("gradle.plugin.com.google.cloud.tools:jib-gradle-plugin:${jibVersion}")
     }
 }
+
 
 apply plugin: 'java-library'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
+apply plugin: 'com.google.cloud.tools.jib'
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
@@ -93,6 +97,23 @@ idea {
             }
         }
     }
+}
+
+jib {
+    from {
+        image = 'openjdk:8u181-jdk-alpine3.8'
+    }
+    to {
+        image = "sample/rest-api:${version}"
+    }
+    container {
+        jvmFlags = ['-Xms128m', '-Xmx128m']
+        mainClass = 'com.example.rest_api.Application'
+        args = []
+        ports = ['8080/tcp']
+        useCurrentTimestamp = true
+    }
+
 }
 
 // for doma

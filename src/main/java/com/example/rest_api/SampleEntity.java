@@ -1,4 +1,4 @@
-package com.example.nuxtspringboot;
+package com.example.rest_api;
 
 import lombok.Data;
 import org.seasar.doma.Entity;

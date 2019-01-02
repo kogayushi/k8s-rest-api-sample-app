@@ -1,4 +1,4 @@
-package com.example.nuxtspringboot;
+package com.example.rest_api;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

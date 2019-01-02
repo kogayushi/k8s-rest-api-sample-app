@@ -1,4 +1,4 @@
-package com.example.nuxtspringboot;
+package com.example.rest_api;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,17 +11,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.AnyRequestMatcher;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    // loginとlogoutを設定する。基本的な設定なので詳細は割愛
     http
       .authorizeRequests()
       .anyRequest().authenticated()
@@ -33,23 +29,21 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
       .permitAll();
 
     http.exceptionHandling()
-        // '/api/**'へ未認証状態でのアクセスには401を返す
         .defaultAuthenticationEntryPointFor(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED), new AntPathRequestMatcher("/api/**"))
-        // 上記パス以外への未認証状態へのアクセスは302リダイレクトで'/login'へ遷移させる
         .defaultAuthenticationEntryPointFor(new LoginUrlAuthenticationEntryPoint("/login"), AnyRequestMatcher.INSTANCE);
 
-//    CookieCsrfTokenRepository cookieCsrfTokenRepository = new CookieCsrfTokenRepository(); // ajaxでcsrf tokenを利用するのでcookieに出力する
-//    cookieCsrfTokenRepository.setCookieHttpOnly(false); // ajaxでも利用するため、httpOnlyはfalseにしておく
+//    CookieCsrfTokenRepository cookieCsrfTokenRepository = new CookieCsrfTokenRepository();
+//    cookieCsrfTokenRepository.setCookieHttpOnly(false);
 //    http.csrf().csrfTokenRepository(cookieCsrfTokenRepository);
     http.csrf().disable();
-//
+
 //    // RESTful APIを公開する場合、攻撃されやすくなるのでcorsの設定をしておく
 //    CorsConfiguration corsConfiguration = new CorsConfiguration();
 //    corsConfiguration.addAllowedMethod(CorsConfiguration.ALL);
 //    corsConfiguration.addAllowedHeader(CorsConfiguration.ALL);
-//    corsConfiguration.addAllowedOrigin("http://localhost:3000"); // 実際は環境ごとにドメインが変わるはずなので、設定で動的に変更でき料にする
+//    corsConfiguration.addAllowedOrigin("http://localhost");
 //    UrlBasedCorsConfigurationSource corsSource = new UrlBasedCorsConfigurationSource();
-//    corsSource.registerCorsConfiguration("/**", corsConfiguration); // すべてのパスを対象にする
+//    corsSource.registerCorsConfiguration("/**", corsConfiguration);
 //    http.cors().configurationSource(corsSource);
   }
 

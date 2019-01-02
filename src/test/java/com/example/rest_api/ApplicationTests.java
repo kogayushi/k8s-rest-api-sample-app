@@ -1,4 +1,4 @@
-package com.example.nuxtspringboot;
+package com.example.rest_api;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,4 +1,4 @@
-package com.example.nuxtspringboot;
+package com.example.rest_api;
 
 import org.seasar.doma.Dao;
 import org.seasar.doma.Insert;
