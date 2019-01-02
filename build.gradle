@@ -104,7 +104,7 @@ jib {
         image = 'openjdk:8u181-jdk-alpine3.8'
     }
     to {
-        image = "kogayushi/k8s-sample-rest-api:${version}"
+        image = "kogayushi/${rootProject.name}:${version}"
     }
     container {
         jvmFlags = ['-Xms128m', '-Xmx128m']
